@@ -3,7 +3,10 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use App\Repositories\User\UserRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 
 class EloquentUserRepository implements UserRepository
 {
@@ -12,9 +15,9 @@ class EloquentUserRepository implements UserRepository
     return User::all();
   }
 
-  public function findbyId($id)
+  public function findById($id)
   {
-    return User::find($id);
+    return User::findOrFail($id);
   }
 
   public function create(array $data)

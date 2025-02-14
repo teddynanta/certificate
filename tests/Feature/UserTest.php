@@ -195,4 +195,40 @@ class UserTest extends TestCase
             ],
         ]);
     }
+
+    public function test_user_cannot_get_all_users(): void
+    {
+        $this->getJson('/api/users')
+            ->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
+            ]);
+    }
+
+    public function test_user_can_find_user_by_id(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->getJson('/api/users/' . $user->id)
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at',
+                ]
+            ]);
+    }
+
+    public function test_user_not_found(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->getJson('/api/users/' . $user->id - 1)
+            ->assertStatus(404)
+            ->assertJsonStructure([
+                'error'
+            ]);
+    }
 }

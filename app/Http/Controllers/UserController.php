@@ -37,9 +37,15 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): UserResource
+    public function show(string $id)
     {
-        return new UserResource($this->userRepository->findbyId($id));
+        try {
+            return new UserResource($this->userRepository->findById($id));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Data not found.'
+            ], 404);
+        }
     }
 
     /**
