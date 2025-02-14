@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
-use Database\Seeders\AdminUserSeeder;
 use Tests\TestCase;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Database\Seeders\AdminUserSeeder;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -113,5 +114,85 @@ class UserTest extends TestCase
         $response->assertJsonValidationErrors('name');
         $response->assertJsonValidationErrors('email');
         $response->assertJsonValidationErrors('password');
+    }
+
+    public function test_user_can_login(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $response = $this->postJson('/api/login', [
+            'email' => 'admin@email.com',
+            'password' => 'password',
+        ]);
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'message',
+            'data' => [
+                'user' => [
+                    'id',
+                    'name',
+                    'role',
+                    'email',
+                    'email_verified_at',
+                    'created_at',
+                    'updated_at',
+                ],
+                'token'
+            ],
+        ]);
+    }
+
+    public function test_user_cannot_login_with_invalid_email(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $response = $this->postJson('/api/login', [
+            'email' => 'invalid-email',
+            'password' => 'password',
+        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('email');
+    }
+
+    public function test_user_cannot_login_with_invalid_password(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $response = $this->postJson('/api/login', [
+            'email' => 'admin@email.com',
+            'password' => 'invalid-password',
+        ]);
+        $response->assertStatus(401);
+        $response->assertJsonStructure([
+            'error',
+        ]);
+    }
+
+    public function test_user_cannot_login_invalid_credentials(): void
+    {
+        //no seeder, which means no user in the database
+        $response = $this->postJson('/api/login', [
+            'email' => 'admin@email.com',
+            'password' => 'invalid-password',
+        ]);
+        $response->assertStatus(401);
+        $response->assertJsonStructure([
+            'error',
+        ]);
+    }
+
+    public function test_user_can_get_all_users(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        // $response = $this->getJson('/api/users');
+        $response = $this->actingAs(User::first())->getJson('/api/users');
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at',
+                ],
+            ],
+        ]);
     }
 }

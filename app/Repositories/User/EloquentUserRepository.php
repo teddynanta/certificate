@@ -12,6 +12,11 @@ class EloquentUserRepository implements UserRepository
     return User::all();
   }
 
+  public function findbyId($id)
+  {
+    return User::find($id);
+  }
+
   public function create(array $data)
   {
     $data['password'] = bcrypt($data['password']);

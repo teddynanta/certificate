@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     protected $userRepository;
 
-    public function __construct(EloquentUserRepository $userRepository)
+    public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
     }
@@ -29,13 +29,7 @@ class UserController extends Controller
      */
     public function store(UserRegisterRequest $request): UserResource
     {
-        // $user = $this->userRepository->create($request->validated());
-
-        try {
-            $user = $this->userRepository->create($request->validated());
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
+        $user = $this->userRepository->create($request->validated());
 
         return new UserResource($user);
     }
@@ -43,9 +37,9 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): UserResource
     {
-        //
+        return new UserResource($this->userRepository->findbyId($id));
     }
 
     /**
