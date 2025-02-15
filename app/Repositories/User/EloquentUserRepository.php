@@ -3,10 +3,11 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
 
 class EloquentUserRepository implements UserRepository
 {
@@ -29,7 +30,17 @@ class EloquentUserRepository implements UserRepository
   public function update(array $data, $id)
   {
     $user = User::find($id);
-    return $user->update($data);
+
+    if (isset($data['password'])) {
+      $data['password'] = Hash::make($data['password']);
+    }
+
+    if ($user->only(array_keys($data)) == $data) {
+      return null;
+    }
+
+    $user->update($data);
+    return $user;
   }
 
   public function delete($id)

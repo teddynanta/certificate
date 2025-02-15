@@ -231,4 +231,19 @@ class UserTest extends TestCase
                 'error'
             ]);
     }
+
+    public function test_user_can_update(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->postJson('/api/users/' . $user->id, [
+            'name' => 'John',
+            'email' => 'John@admin.com',
+            'password' => 'rahasiabanget'
+        ])
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'message'
+            ]);
+    }
 }
