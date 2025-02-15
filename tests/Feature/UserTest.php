@@ -270,4 +270,47 @@ class UserTest extends TestCase
                 'error'
             ]);
     }
+
+    public function test_user_update_form_blanks(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->withHeaders([
+            'Accept' => 'application/json'
+        ])->putJson('/api/users/' . $user->id, [
+            'name' => '',
+            'email' => '',
+            // 'password' => 'password'
+        ])
+            ->assertStatus(422)
+            ->assertJsonStructure([
+                'message'
+            ]);
+    }
+
+    public function test_user_can_delete_user(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->withHeaders([
+            'Accept' => 'application/json'
+        ])->deleteJson('/api/users/' . $user->id + 5)
+            ->assertStatus(200)
+            ->assertJson([
+                'message' => 'User successfully deleted.'
+            ]);
+    }
+
+    public function test_user_delete_id_not_found(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->withHeaders([
+            'Accept' => 'application/json'
+        ])->deleteJson('/api/users/' . $user->id - 5)
+            ->assertStatus(404)
+            ->assertJson([
+                'error' => 'User not found.'
+            ]);
+    }
 }
