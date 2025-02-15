@@ -30,7 +30,7 @@ class UserUpdateRequest extends FormRequest
             'email' => [
                 'sometimes',
                 'email',
-                'unique:App\Models\User, email',
+                // 'unique:App\Models\User,email',
             ],
             'password' => [
                 'sometimes',

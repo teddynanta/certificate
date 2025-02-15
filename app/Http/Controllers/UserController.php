@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Repositories\User\EloquentUserRepository;
 use Illuminate\Http\Request;
 use App\Repositories\User\UserRepository;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -52,17 +53,20 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserUpdateRequest $request, string $id)
+    public function update(UserUpdateRequest $request, string $id): JsonResponse
     {
+        $updatedUser = $this->userRepository->update($request->validated(), $id);
 
-        try {
-            $user = $this->userRepository->update($request->validated(), $id);
-            return new UserResource($user);
-        } catch (\Exception $e) {
+        if (!$updatedUser) {
             return response()->json([
-                'error' => $e->getMessage()
+                'error' => 'No changes detected.'
             ], 422);
         }
+
+        return response()->json([
+            'message' => 'Data updated successfully',
+            'data' => $updatedUser
+        ]);
     }
 
     /**

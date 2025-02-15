@@ -29,11 +29,15 @@ class EloquentUserRepository implements UserRepository
 
   public function update(array $data, $id)
   {
-    $user = User::find($id);
+    $user = User::findorFail($id);
 
     if (isset($data['password'])) {
       $data['password'] = Hash::make($data['password']);
     }
+
+    // $tempuser = $user->only(array_keys())
+    // dd($user->only(array_keys($data)));
+    // // dd($data);
 
     if ($user->only(array_keys($data)) == $data) {
       return null;

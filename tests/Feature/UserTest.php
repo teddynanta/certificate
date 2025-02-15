@@ -236,14 +236,38 @@ class UserTest extends TestCase
     {
         $this->seed(AdminUserSeeder::class);
         $user = User::first();
-        $this->actingAs($user)->postJson('/api/users/' . $user->id, [
+        $this->actingAs($user)->withHeaders([
+            'Accept' => 'application/json'
+        ])->putJson('/api/users/' . $user->id, [
             'name' => 'John',
-            'email' => 'John@admin.com',
-            'password' => 'rahasiabanget'
+            'email' => 'john@admin.com',
+            'password' => 'password'
         ])
             ->assertStatus(200)
             ->assertJsonStructure([
-                'message'
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at'
+                ]
+            ]);
+    }
+
+    public function test_user_update_no_changes(): void
+    {
+        $this->seed(AdminUserSeeder::class);
+        $user = User::first();
+        $this->actingAs($user)->withHeaders([
+            'Accept' => 'application/json'
+        ])->putJson('/api/users/' . $user->id, [
+            'name' => 'Admin',
+            'email' => 'admin@email.com',
+            // 'password' => 'password'
+        ])
+            ->assertStatus(422)
+            ->assertJsonStructure([
+                'error'
             ]);
     }
 }
