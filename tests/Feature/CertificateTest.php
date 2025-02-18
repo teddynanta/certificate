@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Certificate;
 use App\Models\User;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\CertificateSeeder;
@@ -46,7 +47,6 @@ class CertificateTest extends TestCase
                     ]
                 ]
             ]);
-        // dd($response);
     }
 
     public function test_user_certificate_not_exist()
@@ -61,6 +61,22 @@ class CertificateTest extends TestCase
             ->assertJson([
                 'error' => 'No certificates available.'
             ]);
+    }
+
+    public function test_user_can_get_by_code()
+    {
+        $this->seed(DatabaseSeeder::class);
+        $user = User::first();
+        $certificate = Certificate::first()->only('code');
+        // dd($certificate['code']);
+        $response = $this->actingAs($user)->withHeaders([
+            'Accept' => 'application/json'
+        ])->getJson('/api/certificates/verify?code=' . $certificate['code']);
         // dd($response);
+        $response
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => 'ok'
+            ]);
     }
 }

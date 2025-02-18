@@ -22,7 +22,13 @@ class CertificateRepository implements CertificateRepositoryInterface
 
   public function findByCode($code)
   {
-    return Certificate::where('code', $code)->firstOrFail();
+    return Certificate::where('code', $code)->first();
+    // $certificate = Certificate::where('code', $code)->first
+    // try {
+    //   return Certificate::where('code', 'LIKE', '%' .  $code . '%')->first();
+    // } catch (\Throwable $th) {
+    //   return null;
+    // }
   }
 
   public function show($id)
