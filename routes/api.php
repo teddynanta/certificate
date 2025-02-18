@@ -21,8 +21,9 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('certificates')->middleware('auth:sanctum')->group(function () {
     Route::get('/', CertificateController::class . '@index');
+    Route::post('/', CertificateController::class . '@store');
     Route::get('/{id}', CertificateController::class . '@show')->where('id', '[0-9]+');
     Route::get('/verify', CertificateController::class . '@verify');
-    Route::put('/{id}', CertificateController::class . '@update');
-    Route::delete('/{id}', CertificateController::class . '@destroy');
+    Route::put('/{id}', CertificateController::class . '@update')->where('id', '[0-9]+');
+    Route::delete('/{id}', CertificateController::class . '@destroy')->where('id', '[0-9]+');
 });

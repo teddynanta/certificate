@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Arr;
 
-class CertificateStoreRequest extends FormRequest
+class CertificateUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,35 +23,28 @@ class CertificateStoreRequest extends FormRequest
     {
         return [
             'name' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:255',
             ],
 
             'email' => [
-                'required',
+                'sometimes',
                 'email',
                 'max:255',
             ],
 
             'code' => [
-                'required',
+                'sometimes',
                 'max:100',
                 'unique:App\Models\Certificate,code',
                 'regex:/^\d{1,3}\/DISKOMINFOTIKSAN\/[IVXCLDM]+(\.[IVXCLDM]+)?\/\d{4}$/'
             ],
 
             'issued_date' => [
-                'required',
+                'sometimes',
                 'date'
-            ],
+            ]
         ];
     }
-
-    // public function messages(): array
-    // {
-    //     return [
-    //         'code.regex' => 'Code format is invalid, example : 99/DISKOMINFOTIKSAN/I.III/2025'
-    //     ];
-    // }
 }

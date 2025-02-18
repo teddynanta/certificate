@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CertificateStoreRequest;
+use App\Http\Requests\CertificateUpdateRequest;
 use App\Http\Resources\CertificateResource;
 use App\Repositories\Certificate\CertificateRepositoryInterface;
 use Exception;
@@ -24,10 +25,6 @@ class CertificateController extends Controller
      */
     public function index()
     {
-        // return CertificateResource::collection($this->certificateRepository->all());
-        // return new CertificateResource($this->certificateRepository->all());
-        // return $this->certificateRepository->all();
-
         $certificate = $this->certificateRepository->all();
 
         if (!$certificate) {
@@ -59,39 +56,30 @@ class CertificateController extends Controller
 
     public function verify(Request $request)
     {
-        // return response()->json([
-        //     'response' => $request->code
-        // ], 200);
-
-        // $code = urldecode($request->code);
         $certificate = $this->certificateRepository->findByCode($request->code);
-        // Log::info('certificate query:', ['code' => $code]);
 
         if (!$certificate) {
             return response()->json([
-                'error' => 'not found'
+                'error' => 'No certificates found.'
             ], 404);
         }
-        // return new CertificateResource($this->certificateRepository->findByCode($request->code));
-        return response()->json([
-            'data' => $certificate
-        ], 200);
-        // try {
-        //     return new CertificateResource($this->certificateRepository->findByCode($request->code));
-        // } catch (Exception $e) {
-        //     //throw $th;
-        //     return response()->json([
-        //         'error' => 'GAADA'
-        //     ], 404);
-        // }
+        return new CertificateResource($certificate);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CertificateUpdateRequest $request, string $id)
     {
-        //
+        $certificate = $this->certificateRepository->update($request->validated(), $id);
+
+        if (!$certificate) {
+            return response()->json([
+                'message' => 'No Changes Detected.'
+            ], 422);
+        }
+
+        return new CertificateResource($certificate);
     }
 
     /**
@@ -99,6 +87,16 @@ class CertificateController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $certificate = $this->certificateRepository->delete($id);
+
+        if (!$certificate) {
+            return response()->json([
+                'error' => 'Certificate not found.'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Certificate successfully deleted.'
+        ], 200);
     }
 }

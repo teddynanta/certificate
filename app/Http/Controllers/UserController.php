@@ -66,7 +66,7 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Data updated successfully',
             'data' => $updatedUser
-        ]);
+        ], 200);
     }
 
     /**
