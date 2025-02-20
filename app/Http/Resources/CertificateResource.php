@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Recipient;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,10 +18,10 @@ class CertificateResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'recipient_id' => $this->recipient_id,
+            'recipient' => Recipient::find($this->recipient_id)->name,
             'code' => $this->code,
             'issued_date' => $this->issued_date,
-            'created_by' => $this->created_by
+            'created_by' => User::find($this->created_by)->name
         ];
     }
 }

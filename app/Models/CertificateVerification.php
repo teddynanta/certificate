@@ -11,17 +11,13 @@ class CertificateVerification extends Model
 
     protected $fillable = [
         'certificate_id',
+        'ip_address',
+        'user_agent',
         'verified_at',
-        'verified_by'
     ];
 
     public function certificate()
     {
         return $this->belongsTo(Certificate::class);
-    }
-
-    public function verifier()
-    {
-        return $this->belongsTo(User::class, 'verified_by');
     }
 }

@@ -56,7 +56,7 @@ class CertificateController extends Controller
 
     public function verify(Request $request)
     {
-        $certificate = $this->certificateRepository->findByCode($request->code);
+        $certificate = $this->certificateRepository->findByCode($request);
 
         if (!$certificate) {
             return response()->json([

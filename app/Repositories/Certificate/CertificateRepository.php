@@ -2,10 +2,13 @@
 
 namespace App\Repositories\Certificate;
 
-use App\Models\Certificate;
-use App\Models\Recipient;
 use App\Models\User;
+use App\Models\Recipient;
+use App\Models\Certificate;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CertificateVerification;
 
 class CertificateRepository implements CertificateRepositoryInterface
 {
@@ -20,9 +23,27 @@ class CertificateRepository implements CertificateRepositoryInterface
     return $certificate;
   }
 
-  public function findByCode($code)
+  public function findByCode(Request $request)
   {
-    return Certificate::where('code', $code)->first();
+    $code = $request->code;
+    $ip = $request->ip();
+    $userAgent = $request->userAgent();
+    $certificate = Certificate::where('code', $code)->first();
+
+    if (!$certificate) {
+      return response()->json([
+        'error' => 'Not Found.'
+      ], 404);
+    }
+
+    CertificateVerification::create([
+      'certificate_id' => $certificate->id,
+      'verified_at' => date(now()),
+      'ip_address' => $ip,
+      'user_agent' => $userAgent
+    ]);
+
+    return $certificate;
   }
 
   public function show($id)
